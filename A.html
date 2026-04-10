@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>言情故事生成器 🌸</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; background: #0f0a0d; font-family: 'Noto Serif SC', 'Songti SC', STSong, serif; color: #f0d9d0; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 60% 40% at 20% 10%, rgba(196,100,132,0.13) 0%, transparent 70%), radial-gradient(ellipse 50% 50% at 80% 90%, rgba(232,146,140,0.09) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 36px 18px 80px; position: relative; z-index: 1; }
+  .header { text-align: center; margin-bottom: 40px; }
+  .header-sub { font-size: 11px; letter-spacing: 0.3em; color: rgba(232,146,140,0.65); margin-bottom: 10px; }
+  .header h1 { font-size: 30px; font-weight: 700; background: linear-gradient(135deg, #f0d9d0 0%, #e8928c 40%, #c46484 70%, #f0d9d0 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: shimmer 4s linear infinite; line-height: 1.4; }
+  .header p { color: rgba(240,217,208,0.4); font-size: 12px; margin-top: 8px; letter-spacing: 0.08em; }
+  @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+  .apikey-box { background: rgba(255,255,255,0.04); border: 1.5px solid rgba(232,146,140,0.25); border-radius: 14px; padding: 16px 18px; margin-bottom: 28px; }
+  .apikey-box label { display: block; font-size: 12px; color: rgba(232,146,140,0.8); margin-bottom: 8px; letter-spacing: 0.05em; }
+  .apikey-box input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 12px; color: #f0d9d0; font-size: 13px; font-family: monospace; outline: none; transition: border-color 0.2s; }
+  .apikey-box input:focus { border-color: rgba(232,146,140,0.5); }
+  .apikey-hint { font-size: 11px; color: rgba(240,217,208,0.35); margin-top: 7px; line-height: 1.6; }
+  .apikey-hint a { color: rgba(232,146,140,0.6); text-decoration: none; }
+  .section { margin-bottom: 28px; }
+  .section-title { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .section-title .bar { width: 3px; height: 18px; border-radius: 2px; background: linear-gradient(#e8928c, #c46484); flex-shrink: 0; }
+  .section-title span { font-size: 14px; font-weight: 700; letter-spacing: 0.05em; color: #f0d9d0; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .card { cursor: pointer; border: 2px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 12px 10px; background: rgba(255,255,255,0.04); transition: all 0.22s ease; position: relative; text-align: center; user-select: none; -webkit-tap-highlight-color: transparent; }
+  .card:active { transform: scale(0.96); }
+  .card.selected { border-color: #e8928c; background: linear-gradient(135deg, rgba(232,146,140,0.18), rgba(196,100,132,0.1)); transform: scale(1.03); }
+  .card .check { display: none; position: absolute; top: 6px; right: 6px; width: 16px; height: 16px; border-radius: 50%; background: #e8928c; font-size: 10px; color: #fff; align-items: center; justify-content: center; font-weight: 700; }
+  .card.selected .check { display: flex; }
+  .card .emoji { font-size: 20px; margin-bottom: 4px; }
+  .card .label { font-size: 12px; font-weight: 700; color: #f0d9d0; margin-bottom: 2px; }
+  .card .desc { font-size: 10px; color: rgba(240,217,208,0.45); line-height: 1.4; }
+  .len-card { cursor: pointer; border: 2px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 14px 10px; background: rgba(255,255,255,0.04); transition: all 0.22s ease; text-align: center; user-select: none; -webkit-tap-highlight-color: transparent; }
+  .len-card:active { transform: scale(0.96); }
+  .len-card.selected { border-color: #e8928c; background: rgba(232,146,140,0.12); transform: scale(1.03); }
+  .len-card .l-title { font-size: 15px; font-weight: 700; color: #f0d9d0; }
+  .len-card .l-desc { font-size: 11px; color: rgba(240,217,208,0.5); margin-top: 3px; }
+  textarea { width: 100%; background: rgba(255,255,255,0.04); border: 2px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 14px; color: #f0d9d0; font-size: 13px; font-family: inherit; line-height: 1.8; resize: vertical; outline: none; transition: border-color 0.2s; }
+  textarea:focus { border-color: rgba(232,146,140,0.5); }
+  textarea::placeholder { color: rgba(240,217,208,0.3); }
+  .hint { text-align: center; font-size: 12px; color: rgba(240,217,208,0.4); margin-bottom: 12px; }
+  .btn-generate { display: block; width: 100%; padding: 16px; font-size: 16px; font-weight: 700; letter-spacing: 0.15em; border: none; border-radius: 50px; cursor: pointer; background: linear-gradient(135deg, #e8928c, #c46484, #9b4d76); color: #fff; box-shadow: 0 8px 28px rgba(196,100,132,0.4); transition: all 0.25s; font-family: inherit; -webkit-tap-highlight-color: transparent; }
+  .btn-generate:disabled { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.25); box-shadow: none; cursor: not-allowed; }
+  .result-panel { display: none; }
+  .result-panel.show { display: block; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
+  .tag { background: rgba(232,146,140,0.14); border: 1px solid rgba(232,146,140,0.3); border-radius: 50px; padding: 4px 12px; font-size: 11px; color: #e8928c; }
+  .story-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 26px 22px; min-height: 200px; }
+  .story-text { color: #e8d5cc; line-height: 2.1; font-size: 15px; white-space: pre-wrap; letter-spacing: 0.02em; }
+  .loading-box { text-align: center; padding: 50px 0; }
+  .loading-icon { font-size: 28px; animation: pulse 1.4s ease-in-out infinite; }
+  .loading-text { color: rgba(240,217,208,0.55); font-size: 13px; margin-top: 12px; letter-spacing: 0.08em; }
+  .error-box { text-align: center; padding: 40px 0; }
+  .error-icon { font-size: 26px; margin-bottom: 10px; }
+  .error-text { color: #e8928c; font-size: 13px; line-height: 1.7; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.9); } }
+  .bottom-btns { display: flex; gap: 10px; margin-top: 18px; }
+  .btn-back { flex: 1; padding: 13px; font-size: 13px; font-weight: 600; border: 2px solid rgba(232,146,140,0.4); border-radius: 50px; cursor: pointer; background: transparent; color: #e8928c; font-family: inherit; letter-spacing: 0.06em; transition: all 0.2s; }
+  .btn-regen { flex: 1; padding: 13px; font-size: 13px; font-weight: 600; border: none; border-radius: 50px; cursor: pointer; background: linear-gradient(135deg, #e8928c, #c46484); color: #fff; font-family: inherit; letter-spacing: 0.06em; box-shadow: 0 4px 18px rgba(196,100,132,0.35); transition: all 0.2s; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="header-sub">✦ ROMANCE STORY GENERATOR ✦</div>
+    <h1>言情故事生成器</h1>
+    <p>定制你的专属浪漫故事，让 AI 为你写出心动瞬间</p>
+  </div>
+  <div id="configPanel">
+    <div class="apikey-box">
+      <label>🔑 Anthropic API Key</label>
+      <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+      <div class="apikey-hint">填入你的 API Key 才能生成故事。<a href="https://console.anthropic.com/settings/keys" target="_blank">点此获取 →</a><br>Key 仅在本地使用，不会上传任何服务器。</div>
+    </div>
+    <div class="section"><div class="section-title"><div class="bar"></div><span>选择故事场景</span></div><div class="grid-3" id="scenarioGrid"></div></div>
+    <div class="section"><div class="section-title"><div class="bar"></div><span>男主类型</span></div><div class="grid-3" id="maleGrid"></div></div>
+    <div class="section"><div class="section-title"><div class="bar"></div><span>女主类型</span></div><div class="grid-3" id="femaleGrid"></div></div>
+    <div class="section"><div class="section-title"><div class="bar"></div><span>情节设定</span></div><div class="grid-3" id="plotGrid"></div></div>
+    <div class="section"><div class="section-title"><div class="bar"></div><span>故事篇幅</span></div><div class="grid-3" id="lengthGrid"></div></div>
+    <div class="section"><div class="section-title"><div class="bar"></div><span>特别要求（选填）</span></div><textarea id="customWish" rows="3" placeholder="例如：加入雨中相遇的场景、男主要有一句霸道告白..."></textarea></div>
+    <div class="hint" id="hintText">请选择场景、男主、女主和情节类型</div>
+    <button class="btn-generate" id="generateBtn" disabled onclick="generate()">✨ 生成我的故事</button>
+  </div>
+  <div class="result-panel" id="resultPanel">
+    <div class="tags" id="resultTags"></div>
+    <div class="story-box" id="storyBox"></div>
+    <div class="bottom-btns" id="bottomBtns" style="display:none">
+      <button class="btn-back" onclick="backToConfig()">← 重新配置</button>
+      <button class="btn-regen" onclick="generate()">🔄 再生成一篇</button>
+    </div>
+  </div>
+</div>
+<script>
+const DATA = {
+  scenarios: [
+    {id:"ceo",label:"霸道总裁",emoji:"🏢",desc:"偶遇亿万富豪，命运交织"},
+    {id:"ancient",label:"古代宫廷",emoji:"🏯",desc:"深宫大院，情愫暗生"},
+    {id:"campus",label:"青春校园",emoji:"🎓",desc:"同窗之谊，悸动初恋"},
+    {id:"fantasy",label:"仙侠玄幻",emoji:"✨",desc:"修仙问道，千年情缘"},
+    {id:"entertainment",label:"娱乐圈",emoji:"🎬",desc:"聚光灯下，真情难掩"},
+    {id:"military",label:"军婚甜宠",emoji:"🎖️",desc:"铁骨柔情，守护一生"},
+  ],
+  males: [
+    {id:"cold",label:"冷峻禁欲",emoji:"🧊",desc:"表面冷漠，内心深情"},
+    {id:"domineering",label:"霸道强势",emoji:"👑",desc:"说一不二，独宠于你"},
+    {id:"gentle",label:"温柔体贴",emoji:"🌸",desc:"细心呵护，温润如玉"},
+    {id:"badboy",label:"危险痞帅",emoji:"🔥",desc:"危险魅力，偏偏爱你"},
+    {id:"genius",label:"天才学霸",emoji:"🔬",desc:"才华横溢，专情一人"},
+    {id:"king",label:"腹黑帝王",emoji:"⚔️",desc:"深谋远虑，独宠后宫"},
+  ],
+  females: [
+    {id:"strong",label:"独立飒爽",emoji:"💪",desc:"事业为先，却遇真爱"},
+    {id:"sweet",label:"软萌可爱",emoji:"🍬",desc:"天真烂漫，惹人怜爱"},
+    {id:"cold_beauty",label:"清冷美人",emoji:"❄️",desc:"高冷御姐，冰山一角"},
+    {id:"reborn",label:"重生逆袭",emoji:"🦋",desc:"浴火重生，复仇归来"},
+    {id:"ordinary",label:"平凡少女",emoji:"🌻",desc:"普通女孩，被命运选中"},
+  ],
+  plots: [
+    {id:"misunderstanding",label:"误会重重",emoji:"💔"},
+    {id:"fake_marriage",label:"契约婚姻",emoji:"📜"},
+    {id:"revenge",label:"复仇虐恋",emoji:"🗡️"},
+    {id:"childhood",label:"青梅竹马",emoji:"🎀"},
+    {id:"sweet_pet",label:"甜宠日常",emoji:"🍯"},
+    {id:"rival",label:"欢喜冤家",emoji:"⚡"},
+  ],
+  lengths: [
+    {id:"short",label:"短篇",desc:"约500字",tokens:900},
+    {id:"medium",label:"中篇",desc:"约1000字",tokens:1600},
+    {id:"long",label:"长篇",desc:"约2000字",tokens:3000},
+  ],
+};
+const sel = {scenario:null,male:null,female:null,plot:null,length:"medium"};
+function buildGrid(cid,items,key){
+  const el=document.getElementById(cid);el.innerHTML='';
+  items.forEach(item=>{
+    const d=document.createElement('div');d.className='card';d.dataset.id=item.id;
+    d.innerHTML='<div class="check">✓</div><div class="emoji">'+item.emoji+'</div><div class="label">'+item.label+'</div>'+(item.desc?'<div class="desc">'+item.desc+'</div>':'');
+    d.onclick=()=>selectItem(key,item.id,cid);el.appendChild(d);
+  });
+}
+function buildLengthGrid(){
+  const el=document.getElementById('lengthGrid');el.innerHTML='';
+  DATA.lengths.forEach(item=>{
+    const d=document.createElement('div');d.className='len-card'+(item.id===sel.length?' selected':'');
+    d.innerHTML='<div class="l-title">'+item.label+'</div><div class="l-desc">'+item.desc+'</div>';
+    d.onclick=()=>{sel.length=item.id;document.querySelectorAll('.len-card').forEach(c=>c.classList.remove('selected'));d.classList.add('selected');};
+    el.appendChild(d);
+  });
+}
+function selectItem(key,id,cid){
+  sel[key]=id;
+  document.querySelectorAll('#'+cid+' .card').forEach(c=>c.classList.toggle('selected',c.dataset.id===id));
+  checkReady();
+}
+function checkReady(){
+  const ready=sel.scenario&&sel.male&&sel.female&&sel.plot;
+  document.getElementById('generateBtn').disabled=!ready;
+  document.getElementById('hintText').style.display=ready?'none':'block';
+}
+function buildPrompt(){
+  const s=DATA.scenarios.find(x=>x.id===sel.scenario);
+  const m=DATA.males.find(x=>x.id===sel.male);
+  const f=DATA.females.find(x=>x.id===sel.female);
+  const p=DATA.plots.find(x=>x.id===sel.plot);
+  const l=DATA.lengths.find(x=>x.id===sel.length);
+  const wish=document.getElementById('customWish').value.trim();
+  return '你是一位深谙言情小说创作的专业作家，擅长写出让读者心动、情节跌宕的故事。\n\n请根据以下设定，创作一篇精彩的言情故事片段：\n\n【故事场景】'+s.label+'——'+s.desc+'\n【男主类型】'+m.label+'——'+m.desc+'\n【女主类型】'+f.label+'——'+f.desc+'\n【情节类型】'+p.label+'\n【篇幅要求】'+l.desc+'\n'+(wish?'【特别要求】'+wish+'\n':'')+'\n创作要求：\n1. 开篇即抓人眼球，用精彩场景或对话引入\n2. 人物对白要有个性，男主台词符合设定气质，女主展现个人魅力\n3. 细节描写生动，心理描写细腻，情感张力十足\n4. 语言优美流畅，富有文学性，符合言情小说风格\n5. 结尾留有悬念或甜蜜余韵\n\n请直接开始故事正文，不要有任何前言或说明。';
+}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function generate(){
+  const apiKey=document.getElementById('apiKey').value.trim();
+  if(!apiKey){alert('请先填入 API Key');return;}
+  if(!sel.scenario||!sel.male||!sel.female||!sel.plot)return;
+  document.getElementById('configPanel').style.display='none';
+  document.getElementById('resultPanel').classList.add('show');
+  const all=[...DATA.scenarios,...DATA.males,...DATA.females,...DATA.plots];
+  document.getElementById('resultTags').innerHTML=[sel.scenario,sel.male,sel.female,sel.plot].map(id=>all.find(x=>x.id===id)).map(x=>'<span class="tag">'+x.emoji+' '+x.label+'</span>').join('');
+  const storyBox=document.getElementById('storyBox');
+  const bottomBtns=document.getElementById('bottomBtns');
+  storyBox.innerHTML='<div class="loading-box"><div class="loading-icon">🌸</div><div class="loading-text">正在为你编织浪漫故事...</div></div>';
+  bottomBtns.style.display='none';
+  const l=DATA.lengths.find(x=>x.id===sel.length);
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:l.tokens,stream:true,messages:[{role:'user',content:buildPrompt()}]}),
+    });
+    if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err?.error?.message||'请求失败('+res.status+')，请检查API Key');}
+    storyBox.innerHTML='<div class="story-text" id="storyText"></div>';
+    const storyEl=document.getElementById('storyText');
+    let fullText='';
+    const reader=res.body.getReader();const decoder=new TextDecoder();
+    while(true){
+      const{done,value}=await reader.read();if(done)break;
+      const chunk=decoder.decode(value,{stream:true});
+      for(const line of chunk.split('\n')){
+        if(!line.startsWith('data: '))continue;
+        const j=line.slice(6).trim();if(j==='[DONE]')continue;
+        try{const e=JSON.parse(j);if(e.type==='content_block_delta'&&e.delta?.type==='text_delta'){fullText+=e.delta.text;storyEl.textContent=fullText;}}catch(_){}
+      }
+    }
+    if(!fullText.trim())throw new Error('生成内容为空，请重试');
+    bottomBtns.style.display='flex';
+  }catch(e){
+    storyBox.innerHTML='<div class="error-box"><div class="error-icon">⚠️</div><div class="error-text">'+escHtml(e.message)+'</div></div>';
+    bottomBtns.style.display='flex';
+  }
+}
+function backToConfig(){document.getElementById('resultPanel').classList.remove('show');document.getElementById('configPanel').style.display='block';}
+buildGrid('scenarioGrid',DATA.scenarios,'scenario');
+buildGrid('maleGrid',DATA.males,'male');
+buildGrid('femaleGrid',DATA.females,'female');
+buildGrid('plotGrid',DATA.plots,'plot');
+buildLengthGrid();
+</script>
+</body>
+</html>
