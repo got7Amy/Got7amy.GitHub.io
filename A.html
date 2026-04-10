@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>言情故事生成器 🌸</title>
+<title>言情 Prompt 生成器 🌸</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
   *{box-sizing:border-box;margin:0;padding:0}
@@ -15,16 +15,12 @@
   .header h1{font-size:30px;font-weight:700;background:linear-gradient(135deg,#f0d9d0 0%,#e8928c 40%,#c46484 70%,#f0d9d0 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 4s linear infinite;line-height:1.4}
   .header p{color:rgba(240,217,208,.4);font-size:12px;margin-top:8px}
   @keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
-  .apikey-box{background:rgba(255,255,255,.04);border:1.5px solid rgba(232,146,140,.25);border-radius:14px;padding:16px 18px;margin-bottom:28px}
-  .apikey-box label{display:block;font-size:12px;color:rgba(232,146,140,.8);margin-bottom:8px}
-  .apikey-box input{width:100%;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px 12px;color:#f0d9d0;font-size:13px;font-family:monospace;outline:none;transition:border-color .2s}
-  .apikey-box input:focus{border-color:rgba(232,146,140,.5)}
-  .apikey-hint{font-size:11px;color:rgba(240,217,208,.35);margin-top:7px;line-height:1.6}
-  .apikey-hint a{color:rgba(232,146,140,.6);text-decoration:none}
+
   .section{margin-bottom:28px}
   .section-title{display:flex;align-items:center;gap:8px;margin-bottom:12px}
   .section-title .bar{width:3px;height:18px;border-radius:2px;background:linear-gradient(#e8928c,#c46484);flex-shrink:0}
   .section-title span{font-size:14px;font-weight:700;color:#f0d9d0}
+
   .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   .card{cursor:pointer;border:2px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 10px;background:rgba(255,255,255,.04);transition:all .22s;position:relative;text-align:center;user-select:none;-webkit-tap-highlight-color:transparent}
   .card:active{transform:scale(.96)}
@@ -34,65 +30,167 @@
   .card .emoji{font-size:20px;margin-bottom:4px}
   .card .label{font-size:12px;font-weight:700;color:#f0d9d0;margin-bottom:2px}
   .card .desc{font-size:10px;color:rgba(240,217,208,.45);line-height:1.4}
+
   .len-card{cursor:pointer;border:2px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 10px;background:rgba(255,255,255,.04);transition:all .22s;text-align:center;user-select:none;-webkit-tap-highlight-color:transparent}
   .len-card.selected{border-color:#e8928c;background:rgba(232,146,140,.12);transform:scale(1.03)}
   .len-card .l-title{font-size:15px;font-weight:700;color:#f0d9d0}
   .len-card .l-desc{font-size:11px;color:rgba(240,217,208,.5);margin-top:3px}
-  textarea{width:100%;background:rgba(255,255,255,.04);border:2px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;color:#f0d9d0;font-size:13px;font-family:inherit;line-height:1.8;resize:vertical;outline:none;transition:border-color .2s}
+
+  textarea{
+    width:100%;
+    background:rgba(255,255,255,.04);
+    border:2px solid rgba(255,255,255,.08);
+    border-radius:12px;
+    padding:12px 14px;
+    color:#f0d9d0;
+    font-size:13px;
+    font-family:inherit;
+    line-height:1.8;
+    resize:vertical;
+    outline:none;
+    transition:border-color .2s
+  }
   textarea:focus{border-color:rgba(232,146,140,.5)}
   textarea::placeholder{color:rgba(240,217,208,.3)}
+
   .hint{text-align:center;font-size:12px;color:rgba(240,217,208,.4);margin-bottom:12px}
-  .btn-generate{display:block;width:100%;padding:16px;font-size:16px;font-weight:700;letter-spacing:.15em;border:none;border-radius:50px;cursor:pointer;background:linear-gradient(135deg,#e8928c,#c46484,#9b4d76);color:#fff;box-shadow:0 8px 28px rgba(196,100,132,.4);transition:all .25s;font-family:inherit}
+  .btn-generate{
+    display:block;width:100%;padding:16px;font-size:16px;font-weight:700;letter-spacing:.15em;
+    border:none;border-radius:50px;cursor:pointer;
+    background:linear-gradient(135deg,#e8928c,#c46484,#9b4d76);
+    color:#fff;box-shadow:0 8px 28px rgba(196,100,132,.4);
+    transition:all .25s;font-family:inherit
+  }
   .btn-generate:disabled{background:rgba(255,255,255,.08);color:rgba(255,255,255,.25);box-shadow:none;cursor:not-allowed}
+
   .result-panel{display:none}
   .result-panel.show{display:block;animation:fadeIn .4s ease}
   @keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
   .tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px}
   .tag{background:rgba(232,146,140,.14);border:1px solid rgba(232,146,140,.3);border-radius:50px;padding:4px 12px;font-size:11px;color:#e8928c}
-  .story-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:26px 22px;min-height:200px}
-  .story-text{color:#e8d5cc;line-height:2.1;font-size:15px;white-space:pre-wrap;letter-spacing:.02em}
-  .loading-box{text-align:center;padding:50px 0}
-  .loading-icon{font-size:28px;animation:pulse 1.4s ease-in-out infinite}
-  .loading-text{color:rgba(240,217,208,.55);font-size:13px;margin-top:12px}
-  .error-box{text-align:center;padding:40px 0}
-  .error-text{color:#e8928c;font-size:13px;line-height:1.7;margin-top:10px}
-  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.9)}}
+
+  .prompt-box{
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:18px;
+    padding:18px;
+    min-height:220px
+  }
+
+  .prompt-actions{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:12px
+  }
+
+  .btn-copy{
+    padding:10px 16px;
+    font-size:12px;
+    font-weight:700;
+    border:none;
+    border-radius:999px;
+    cursor:pointer;
+    background:linear-gradient(135deg,#e8928c,#c46484);
+    color:#fff;
+    box-shadow:0 4px 18px rgba(196,100,132,.35);
+    font-family:inherit
+  }
+
+  .btn-copy.copied{
+    background:linear-gradient(135deg,#88c6a0,#5aa97b);
+    box-shadow:0 4px 18px rgba(90,169,123,.28);
+  }
+
+  .prompt-text{
+    color:#e8d5cc;
+    line-height:2;
+    font-size:14px;
+    white-space:pre-wrap;
+    word-break:break-word;
+    letter-spacing:.02em
+  }
+
   .bottom-btns{display:flex;gap:10px;margin-top:18px}
-  .btn-back{flex:1;padding:13px;font-size:13px;font-weight:600;border:2px solid rgba(232,146,140,.4);border-radius:50px;cursor:pointer;background:transparent;color:#e8928c;font-family:inherit;transition:all .2s}
-  .btn-regen{flex:1;padding:13px;font-size:13px;font-weight:600;border:none;border-radius:50px;cursor:pointer;background:linear-gradient(135deg,#e8928c,#c46484);color:#fff;font-family:inherit;box-shadow:0 4px 18px rgba(196,100,132,.35)}
+  .btn-back{
+    flex:1;padding:13px;font-size:13px;font-weight:600;border:2px solid rgba(232,146,140,.4);
+    border-radius:50px;cursor:pointer;background:transparent;color:#e8928c;font-family:inherit;transition:all .2s
+  }
+  .btn-regen{
+    flex:1;padding:13px;font-size:13px;font-weight:600;border:none;border-radius:50px;cursor:pointer;
+    background:linear-gradient(135deg,#e8928c,#c46484);color:#fff;font-family:inherit;box-shadow:0 4px 18px rgba(196,100,132,.35)
+  }
+
+  .tip{
+    margin-top:12px;
+    text-align:center;
+    font-size:12px;
+    color:rgba(240,217,208,.38)
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="header">
-    <div class="header-sub">✦ ROMANCE STORY GENERATOR ✦</div>
-    <h1>言情故事生成器</h1>
-    <p>定制你的专属浪漫故事，让 AI 为你写出心动瞬间</p>
+    <div class="header-sub">✦ ROMANCE PROMPT GENERATOR ✦</div>
+    <h1>言情 Prompt 生成器</h1>
+    <p>选好设定，一键生成可直接复制的创作提示词</p>
   </div>
+
   <div id="configPanel">
-    <div class="apikey-box">
-      <label>🔑 Gemini API Key（免费）</label>
-      <input type="password" id="apiKey" placeholder="AIza..." autocomplete="off" spellcheck="false">
-      <div class="apikey-hint">免费获取：<a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey →</a><br>Key 仅在本地使用，不会上传任何服务器。</div>
+    <div class="section">
+      <div class="section-title"><div class="bar"></div><span>选择故事场景</span></div>
+      <div class="grid-3" id="scenarioGrid"></div>
     </div>
-    <div class="section"><div class="section-title"><div class="bar"></div><span>选择故事场景</span></div><div class="grid-3" id="scenarioGrid"></div></div>
-    <div class="section"><div class="section-title"><div class="bar"></div><span>男主类型</span></div><div class="grid-3" id="maleGrid"></div></div>
-    <div class="section"><div class="section-title"><div class="bar"></div><span>女主类型</span></div><div class="grid-3" id="femaleGrid"></div></div>
-    <div class="section"><div class="section-title"><div class="bar"></div><span>情节设定</span></div><div class="grid-3" id="plotGrid"></div></div>
-    <div class="section"><div class="section-title"><div class="bar"></div><span>故事篇幅</span></div><div class="grid-3" id="lengthGrid"></div></div>
-    <div class="section"><div class="section-title"><div class="bar"></div><span>特别要求（选填）</span></div><textarea id="customWish" rows="3" placeholder="例如：加入雨中相遇的场景、男主要有一句霸道告白..."></textarea></div>
+
+    <div class="section">
+      <div class="section-title"><div class="bar"></div><span>男主类型</span></div>
+      <div class="grid-3" id="maleGrid"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><div class="bar"></div><span>女主类型</span></div>
+      <div class="grid-3" id="femaleGrid"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><div class="bar"></div><span>情节设定</span></div>
+      <div class="grid-3" id="plotGrid"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><div class="bar"></div><span>故事篇幅</span></div>
+      <div class="grid-3" id="lengthGrid"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><div class="bar"></div><span>特别要求（选填）</span></div>
+      <textarea id="customWish" rows="3" placeholder="例如：加入雨中相遇的场景、男主要有一句霸道告白..."></textarea>
+    </div>
+
     <div class="hint" id="hintText">请选择场景、男主、女主和情节类型</div>
-    <button class="btn-generate" id="generateBtn" disabled onclick="generate()">✨ 生成我的故事</button>
+    <button class="btn-generate" id="generateBtn" disabled onclick="generatePrompt()">✨ 生成 Prompt</button>
   </div>
+
   <div class="result-panel" id="resultPanel">
     <div class="tags" id="resultTags"></div>
-    <div class="story-box" id="storyBox"></div>
-    <div class="bottom-btns" id="bottomBtns" style="display:none">
+
+    <div class="prompt-box">
+      <div class="prompt-actions">
+        <button class="btn-copy" id="copyBtn" onclick="copyPrompt()">📋 复制 Prompt</button>
+      </div>
+      <div class="prompt-text" id="promptText"></div>
+    </div>
+
+    <div class="tip">复制后可直接贴到 Gemini、ChatGPT、Claude 之类的模型里。</div>
+
+    <div class="bottom-btns">
       <button class="btn-back" onclick="backToConfig()">← 重新配置</button>
-      <button class="btn-regen" onclick="generate()">🔄 再生成一篇</button>
+      <button class="btn-regen" onclick="generatePrompt()">🔄 重新生成</button>
     </div>
   </div>
 </div>
+
 <script>
 const DATA={
   scenarios:[
@@ -127,41 +225,61 @@ const DATA={
     {id:"rival",label:"欢喜冤家",emoji:"⚡"},
   ],
   lengths:[
-    {id:"short",label:"短篇",desc:"约500字",tokens:900},
-    {id:"medium",label:"中篇",desc:"约1000字",tokens:1600},
-    {id:"long",label:"长篇",desc:"约2000字",tokens:3000},
+    {id:"short",label:"短篇",desc:"约500字"},
+    {id:"medium",label:"中篇",desc:"约1000字"},
+    {id:"long",label:"长篇",desc:"约2000字"},
   ],
 };
+
 const sel={scenario:null,male:null,female:null,plot:null,length:"medium"};
+
 function buildGrid(cid,items,key){
-  const el=document.getElementById(cid);el.innerHTML='';
+  const el=document.getElementById(cid);
+  el.innerHTML='';
   items.forEach(item=>{
-    const d=document.createElement('div');d.className='card';d.dataset.id=item.id;
-    d.innerHTML='<div class="check">✓</div><div class="emoji">'+item.emoji+'</div><div class="label">'+item.label+'</div>'+(item.desc?'<div class="desc">'+item.desc+'</div>':'');
+    const d=document.createElement('div');
+    d.className='card';
+    d.dataset.id=item.id;
+    d.innerHTML=
+      '<div class="check">✓</div>'+
+      '<div class="emoji">'+item.emoji+'</div>'+
+      '<div class="label">'+item.label+'</div>'+
+      (item.desc?'<div class="desc">'+item.desc+'</div>':'');
     d.onclick=()=>selectItem(key,item.id,cid);
     el.appendChild(d);
   });
 }
+
 function buildLengthGrid(){
-  const el=document.getElementById('lengthGrid');el.innerHTML='';
+  const el=document.getElementById('lengthGrid');
+  el.innerHTML='';
   DATA.lengths.forEach(item=>{
     const d=document.createElement('div');
     d.className='len-card'+(item.id===sel.length?' selected':'');
     d.innerHTML='<div class="l-title">'+item.label+'</div><div class="l-desc">'+item.desc+'</div>';
-    d.onclick=()=>{sel.length=item.id;document.querySelectorAll('.len-card').forEach(c=>c.classList.remove('selected'));d.classList.add('selected');};
+    d.onclick=()=>{
+      sel.length=item.id;
+      document.querySelectorAll('.len-card').forEach(c=>c.classList.remove('selected'));
+      d.classList.add('selected');
+    };
     el.appendChild(d);
   });
 }
+
 function selectItem(key,id,cid){
   sel[key]=id;
-  document.querySelectorAll('#'+cid+' .card').forEach(c=>c.classList.toggle('selected',c.dataset.id===id));
+  document.querySelectorAll('#'+cid+' .card').forEach(c=>{
+    c.classList.toggle('selected',c.dataset.id===id);
+  });
   checkReady();
 }
+
 function checkReady(){
   const ok=sel.scenario&&sel.male&&sel.female&&sel.plot;
   document.getElementById('generateBtn').disabled=!ok;
   document.getElementById('hintText').style.display=ok?'none':'block';
 }
+
 function buildPrompt(){
   const s=DATA.scenarios.find(x=>x.id===sel.scenario);
   const m=DATA.males.find(x=>x.id===sel.male);
@@ -169,69 +287,100 @@ function buildPrompt(){
   const p=DATA.plots.find(x=>x.id===sel.plot);
   const l=DATA.lengths.find(x=>x.id===sel.length);
   const w=document.getElementById('customWish').value.trim();
-  return '你是一位深谙言情小说创作的专业作家，擅长写出让读者心动、情节跌宕的故事。\n\n请根据以下设定，创作一篇精彩的言情故事片段：\n\n【故事场景】'+s.label+'——'+s.desc+'\n【男主类型】'+m.label+'——'+m.desc+'\n【女主类型】'+f.label+'——'+f.desc+'\n【情节类型】'+p.label+'\n【篇幅要求】'+l.desc+(w?'\n【特别要求】'+w:'')+'\n\n创作要求：\n1. 开篇即抓人眼球，用精彩场景或对话引入\n2. 人物对白有个性，男主台词符合设定，女主展现魅力\n3. 细节描写生动，心理描写细腻，情感张力十足\n4. 语言优美流畅，符合言情小说风格\n5. 结尾留有悬念或甜蜜余韵\n\n请直接开始故事正文，不要有任何前言。';
+
+  return `你是一位深谙言情小说创作的专业作家，擅长写出让读者心动、情节跌宕、人物鲜活的故事。
+
+请根据以下设定，创作一篇精彩的言情故事片段：
+
+【故事场景】${s.label}——${s.desc}
+【男主类型】${m.label}——${m.desc}
+【女主类型】${f.label}——${f.desc}
+【情节类型】${p.label}
+【篇幅要求】${l.desc}${w ? `\n【特别要求】${w}` : ''}
+
+创作要求：
+1. 开篇即抓人眼球，用精彩场景或对话引入
+2. 人物对白有个性，男主台词符合设定，女主展现魅力
+3. 细节描写生动，心理描写细腻，情感张力十足
+4. 语言优美流畅，符合言情小说风格
+5. 结尾留有悬念或甜蜜余韵
+
+请直接开始故事正文，不要有任何前言。`;
 }
-function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-async function generate(){
-  const apiKey=document.getElementById('apiKey').value.trim();
-  if(!apiKey){alert('请先填入 Gemini API Key');return;}
+
+function generatePrompt(){
   if(!sel.scenario||!sel.male||!sel.female||!sel.plot)return;
+
+  const prompt=buildPrompt();
+
   document.getElementById('configPanel').style.display='none';
   document.getElementById('resultPanel').classList.add('show');
+
   const all=[...DATA.scenarios,...DATA.males,...DATA.females,...DATA.plots];
   document.getElementById('resultTags').innerHTML=[sel.scenario,sel.male,sel.female,sel.plot]
     .map(id=>all.find(x=>x.id===id))
-    .map(x=>'<span class="tag">'+x.emoji+' '+x.label+'</span>').join('');
-  const storyBox=document.getElementById('storyBox');
-  const bottomBtns=document.getElementById('bottomBtns');
-  storyBox.innerHTML='<div class="loading-box"><div class="loading-icon">🌸</div><div class="loading-text">正在为你编织浪漫故事...</div></div>';
-  bottomBtns.style.display='none';
-  const l=DATA.lengths.find(x=>x.id===sel.length);
+    .map(x=>'<span class="tag">'+x.emoji+' '+x.label+'</span>')
+    .join('');
+
+  document.getElementById('promptText').textContent=prompt;
+
+  const copyBtn=document.getElementById('copyBtn');
+  copyBtn.textContent='📋 复制 Prompt';
+  copyBtn.classList.remove('copied');
+}
+
+async function copyPrompt(){
+  const text=document.getElementById('promptText').textContent;
+  const btn=document.getElementById('copyBtn');
+
   try{
-    const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key='+encodeURIComponent(apiKey);
-    const res=await fetch(url,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        contents:[{role:'user',parts:[{text:buildPrompt()}]}],
-        generationConfig:{maxOutputTokens:l.tokens,temperature:0.9},
-      }),
-    });
-    if(!res.ok){
-      const err=await res.json().catch(()=>({}));
-      throw new Error(err?.error?.message||'请求失败('+res.status+')，请检查 API Key');
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+    }else{
+      fallbackCopy(text);
     }
-    storyBox.innerHTML='<div class="story-text" id="storyText"></div>';
-    const storyEl=document.getElementById('storyText');
-    let fullText='';
-    const reader=res.body.getReader();
-    const decoder=new TextDecoder();
-    while(true){
-      const{done,value}=await reader.read();
-      if(done)break;
-      const chunk=decoder.decode(value,{stream:true});
-      for(const line of chunk.split('\n')){
-        if(!line.startsWith('data: '))continue;
-        const j=line.slice(6).trim();
-        if(!j)continue;
-        try{
-          const e=JSON.parse(j);
-          const t=e?.candidates?.[0]?.content?.parts?.[0]?.text;
-          if(t){fullText+=t;storyEl.textContent=fullText;}
-        }catch(_){}
-      }
-    }
-    if(!fullText.trim())throw new Error('生成内容为空，请重试');
-    bottomBtns.style.display='flex';
+    btn.textContent='✅ 已复制';
+    btn.classList.add('copied');
+    setTimeout(()=>{
+      btn.textContent='📋 复制 Prompt';
+      btn.classList.remove('copied');
+    },1800);
   }catch(e){
-    storyBox.innerHTML='<div class="error-box"><div class="loading-icon">⚠️</div><div class="error-text">'+escHtml(e.message)+'</div></div>';
-    bottomBtns.style.display='flex';
+    try{
+      fallbackCopy(text);
+      btn.textContent='✅ 已复制';
+      btn.classList.add('copied');
+      setTimeout(()=>{
+        btn.textContent='📋 复制 Prompt';
+        btn.classList.remove('copied');
+      },1800);
+    }catch(err){
+      alert('复制失败，请手动长按选择文字复制');
+    }
   }
 }
+
+function fallbackCopy(text){
+  const ta=document.createElement('textarea');
+  ta.value=text;
+  ta.setAttribute('readonly','');
+  ta.style.position='fixed';
+  ta.style.opacity='0';
+  ta.style.left='-9999px';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  ta.setSelectionRange(0, ta.value.length);
+  const ok=document.execCommand('copy');
+  document.body.removeChild(ta);
+  if(!ok) throw new Error('copy failed');
+}
+
 function backToConfig(){
   document.getElementById('resultPanel').classList.remove('show');
   document.getElementById('configPanel').style.display='block';
 }
+
 buildGrid('scenarioGrid',DATA.scenarios,'scenario');
 buildGrid('maleGrid',DATA.males,'male');
 buildGrid('femaleGrid',DATA.females,'female');
