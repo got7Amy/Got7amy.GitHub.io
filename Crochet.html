@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的钩织日志</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Noto+Serif+SC:wght@300;400;600&family=DM+Mono:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #f5f0e8;
+      --warm-white: #faf7f2;
+      --tan: #d6c9b0;
+      --brown: #8b6f4e;
+      --dark-brown: #3d2b1a;
+      --rust: #b5522a;
+      --sage: #7a8c6e;
+      --dusty-rose: #c4856a;
+      --ink: #2c1f12;
+      --mid: #6b5240;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--cream);
+      color: var(--ink);
+      font-family: 'Noto Serif SC', serif;
+      font-weight: 300;
+      line-height: 1.8;
+      background-image:
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9b99a' fill-opacity='0.12'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      text-align: center;
+      padding: 72px 24px 56px;
+      border-bottom: 1px solid var(--tan);
+      position: relative;
+    }
+    header::before {
+      content: '✦ ❧ ✦';
+      display: block;
+      font-size: 1rem;
+      color: var(--brown);
+      letter-spacing: 0.4em;
+      margin-bottom: 20px;
+      opacity: 0.7;
+    }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 600;
+      color: var(--dark-brown);
+      letter-spacing: 0.02em;
+      line-height: 1.15;
+    }
+    header h1 em {
+      display: block;
+      font-style: italic;
+      font-size: 0.55em;
+      color: var(--brown);
+      font-weight: 400;
+      letter-spacing: 0.15em;
+      margin-top: 6px;
+    }
+    .hook-divider {
+      margin: 20px auto 0;
+      width: 120px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--tan), transparent);
+    }
+
+    /* ─── NAV TABS ─── */
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--tan);
+      background: var(--warm-white);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'Noto Serif SC', serif;
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: var(--mid);
+      padding: 18px 36px;
+      letter-spacing: 0.12em;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+      position: relative;
+      top: 1px;
+    }
+    .tab-btn:hover { color: var(--dark-brown); }
+    .tab-btn.active {
+      color: var(--rust);
+      border-bottom-color: var(--rust);
+      font-weight: 600;
+    }
+
+    /* ─── MAIN ─── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 56px 24px 100px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+    .section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      color: var(--dark-brown);
+      font-weight: 600;
+    }
+    .count-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--brown);
+      background: var(--tan);
+      padding: 2px 10px;
+      border-radius: 20px;
+      opacity: 0.8;
+    }
+
+    /* ─── CARD GRID ─── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 36px;
+    }
+
+    .card {
+      background: var(--warm-white);
+      border: 1px solid var(--tan);
+      border-radius: 2px;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(61,43,26,0.12);
+    }
+
+    .card-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      display: block;
+      background: var(--tan);
+    }
+    .card-img-placeholder {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: linear-gradient(135deg, #e8dccb 0%, #d6c9b0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: var(--brown);
+      opacity: 0.5;
+    }
+
+    .card-body { padding: 24px 24px 20px; }
+    .card-status {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .status-wip { color: var(--sage); }
+    .status-done { color: var(--dusty-rose); }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--dark-brown);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    .card-desc {
+      font-size: 0.85rem;
+      color: var(--mid);
+      line-height: 1.75;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .card-footer {
+      padding: 0 24px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .read-more {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--rust);
+      letter-spacing: 0.1em;
+      border-bottom: 1px solid var(--rust);
+      padding-bottom: 1px;
+    }
+
+    /* ─── MODAL ─── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(44,31,18,0.65);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--warm-white);
+      border: 1px solid var(--tan);
+      max-width: 720px;
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      border-radius: 2px;
+      animation: modal-in 0.25s ease;
+    }
+    @keyframes modal-in {
+      from { opacity: 0; transform: translateY(20px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      display: block;
+    }
+    .modal-img-placeholder {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, #e8dccb, #d6c9b0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      color: var(--brown);
+      opacity: 0.4;
+    }
+
+    .modal-content { padding: 36px 40px 44px; }
+    .modal-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 600;
+      color: var(--dark-brown);
+      margin-bottom: 8px;
+    }
+    .modal-body {
+      font-size: 0.9rem;
+      color: var(--mid);
+      line-height: 1.9;
+      white-space: pre-wrap;
+    }
+
+    .close-btn {
+      background: none;
+      border: 1px solid var(--tan);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: var(--mid);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .close-btn:hover { background: var(--tan); }
+
+    /* ─── ADD BUTTON ─── */
+    .add-card {
+      border: 2px dashed var(--tan);
+      border-radius: 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 280px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      gap: 12px;
+      color: var(--brown);
+      opacity: 0.6;
+    }
+    .add-card:hover { border-color: var(--brown); background: rgba(255,255,255,0.4); opacity: 1; }
+    .add-card span { font-size: 2rem; }
+    .add-card p { font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.15em; }
+
+    /* ─── ADD FORM MODAL ─── */
+    .form-modal {
+      background: var(--warm-white);
+      border: 1px solid var(--tan);
+      max-width: 560px;
+      width: 100%;
+      border-radius: 2px;
+      padding: 40px;
+      animation: modal-in 0.25s ease;
+    }
+    .form-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--dark-brown);
+      margin-bottom: 28px;
+    }
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      color: var(--brown);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      background: var(--cream);
+      border: 1px solid var(--tan);
+      padding: 10px 14px;
+      font-family: 'Noto Serif SC', serif;
+      font-size: 0.88rem;
+      color: var(--ink);
+      border-radius: 1px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus { border-color: var(--brown); }
+    .field textarea { resize: vertical; min-height: 120px; }
+
+    .form-actions { display: flex; gap: 12px; margin-top: 28px; }
+    .btn-save {
+      background: var(--dark-brown);
+      color: var(--cream);
+      border: none;
+      padding: 12px 28px;
+      font-family: 'Noto Serif SC', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      border-radius: 1px;
+      transition: background 0.15s;
+    }
+    .btn-save:hover { background: var(--rust); }
+    .btn-cancel {
+      background: none;
+      border: 1px solid var(--tan);
+      padding: 12px 20px;
+      font-family: 'Noto Serif SC', serif;
+      font-size: 0.85rem;
+      color: var(--mid);
+      cursor: pointer;
+      border-radius: 1px;
+    }
+
+    /* ─── EMPTY STATE ─── */
+    .empty {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--brown);
+      opacity: 0.5;
+    }
+    .empty p { font-size: 0.9rem; margin-top: 8px; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      text-align: center;
+      padding: 32px;
+      border-top: 1px solid var(--tan);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--brown);
+      letter-spacing: 0.12em;
+      opacity: 0.6;
+    }
+
+    /* ─── SECTION VISIBILITY ─── */
+    .tab-section { display: none; }
+    .tab-section.active { display: block; }
+
+    @media (max-width: 600px) {
+      .tab-btn { padding: 16px 20px; font-size: 0.82rem; }
+      .modal-content { padding: 24px; }
+      .form-modal { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>我的钩织日志 <em>Crochet Journal</em></h1>
+  <div class="hook-divider"></div>
+</header>
+
+<nav>
+  <button class="tab-btn active" onclick="switchTab('wip')">🧶 进行中</button>
+  <button class="tab-btn" onclick="switchTab('done')">✨ 已完成</button>
+</nav>
+
+<main>
+  <!-- 进行中 -->
+  <section id="wip" class="tab-section active">
+    <div class="section-header">
+      <h2>进行中的项目</h2>
+      <span class="count-badge" id="wip-count">0</span>
+    </div>
+    <div class="grid" id="wip-grid">
+      <div class="add-card" onclick="openAddForm('wip')">
+        <span>＋</span>
+        <p>添加新项目</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 已完成 -->
+  <section id="done" class="tab-section">
+    <div class="section-header">
+      <h2>已完成的项目</h2>
+      <span class="count-badge" id="done-count">0</span>
+    </div>
+    <div class="grid" id="done-grid">
+      <div class="add-card" onclick="openAddForm('done')">
+        <span>＋</span>
+        <p>添加新项目</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detail-modal" onclick="closeDetailModal(event)">
+  <div class="modal">
+    <div id="modal-image-area"></div>
+    <div class="modal-content">
+      <div class="modal-meta">
+        <span class="card-status" id="modal-status"></span>
+        <button class="close-btn" onclick="closeModal()">✕</button>
+      </div>
+      <h2 class="modal-title" id="modal-title"></h2>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Form Modal -->
+<div class="modal-overlay" id="add-modal" onclick="closeAddModal(event)">
+  <div class="form-modal" onclick="event.stopPropagation()">
+    <h3 class="form-title">添加钩织项目</h3>
+    <div class="field">
+      <label>项目名称</label>
+      <input type="text" id="f-name" placeholder="例：草莓贝雷帽" />
+    </div>
+    <div class="field">
+      <label>图片 URL（可选）</label>
+      <input type="url" id="f-img" placeholder="https://..." />
+    </div>
+    <div class="field">
+      <label>图解 / 描述</label>
+      <textarea id="f-desc" placeholder="材料、针法、进度备注……"></textarea>
+    </div>
+    <input type="hidden" id="f-status" />
+    <input type="hidden" id="f-edit-id" />
+    <div class="form-actions">
+      <button class="btn-save" onclick="saveProject()">保存</button>
+      <button class="btn-cancel" onclick="closeModal()">取消</button>
+    </div>
+  </div>
+</div>
+
+<footer>❧ &nbsp; 用钩针记录每一针的时光 &nbsp; ❧</footer>
+
+<script>
+  // ── DATA ──────────────────────────────────────────────────────────────
+  // Edit the PROJECTS array to pre-populate your journal.
+  // Each project: { id, status: 'wip'|'done', name, img, desc }
+  const PROJECTS_KEY = 'crochet_journal_v1';
+
+  function loadProjects() {
+    try {
+      const raw = localStorage.getItem(PROJECTS_KEY);
+      return raw ? JSON.parse(raw) : getSeedData();
+    } catch { return getSeedData(); }
+  }
+
+  function saveProjects(data) {
+    localStorage.setItem(PROJECTS_KEY, JSON.stringify(data));
+  }
+
+  function getSeedData() {
+    // 示例项目 — 可以删掉这里换成自己的
+    return [
+      {
+        id: 1,
+        status: 'wip',
+        name: '奶油色小熊玩偶',
+        img: '',
+        desc: '材料：奶油色棉线 200g，4mm 钩针，玩偶填充棉\n\n当前进度：头部完成，正在钩身体。\n\n图解来源：小红书 @xxx，采用魔法圈起针，短针螺旋钩法。\n\n注意：耳朵要等全身缝合后再决定大小。'
+      },
+      {
+        id: 2,
+        status: 'done',
+        name: '薄荷绿渔夫帽',
+        img: '',
+        desc: '材料：Paintbox Simply DK 薄荷绿 180g，4.5mm 钩针\n\n图解：往返行钩，边缘用引拔针收边。帽檐三行短针。\n\n完成于 2025年3月，送给朋友。'
+      }
+    ];
+  }
+
+  let projects = loadProjects();
+  let idCounter = projects.reduce((m, p) => Math.max(m, p.id), 0) + 1;
+
+  // ── RENDER ────────────────────────────────────────────────────────────
+  function render() {
+    renderGrid('wip');
+    renderGrid('done');
+  }
+
+  function renderGrid(status) {
+    const grid = document.getElementById(`${status}-grid`);
+    const count = document.getElementById(`${status}-count`);
+    const items = projects.filter(p => p.status === status);
+    count.textContent = items.length;
+
+    // Clear except add-card
+    [...grid.children].forEach(c => { if (!c.classList.contains('add-card')) c.remove(); });
+
+    items.forEach(p => {
+      const card = buildCard(p);
+      grid.insertBefore(card, grid.querySelector('.add-card'));
+    });
+  }
+
+  function buildCard(p) {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.onclick = () => openDetail(p.id);
+
+    const imgHtml = p.img
+      ? `<img class="card-img" src="${escHtml(p.img)}" alt="${escHtml(p.name)}" onerror="this.style.display='none';this.nextSibling.style.display='flex'" /><div class="card-img-placeholder" style="display:none">🧶</div>`
+      : `<div class="card-img-placeholder">🧶</div>`;
+
+    const statusLabel = p.status === 'wip' ? '● 进行中' : '✓ 已完成';
+    const statusClass = p.status === 'wip' ? 'status-wip' : 'status-done';
+    const shortDesc = p.desc.slice(0, 120);
+
+    div.innerHTML = `
+      ${imgHtml}
+      <div class="card-body">
+        <div class="card-status ${statusClass}">${statusLabel}</div>
+        <div class="card-title">${escHtml(p.name)}</div>
+        <div class="card-desc">${escHtml(shortDesc)}</div>
+      </div>
+      <div class="card-footer">
+        <span class="read-more">查看详情 →</span>
+      </div>`;
+    return div;
+  }
+
+  // ── DETAIL MODAL ──────────────────────────────────────────────────────
+  function openDetail(id) {
+    const p = projects.find(x => x.id === id);
+    if (!p) return;
+
+    const imgArea = document.getElementById('modal-image-area');
+    imgArea.innerHTML = p.img
+      ? `<img class="modal-img" src="${escHtml(p.img)}" alt="${escHtml(p.name)}" onerror="this.outerHTML='<div class=modal-img-placeholder>🧶</div>'" />`
+      : `<div class="modal-img-placeholder">🧶</div>`;
+
+    const statusLabel = p.status === 'wip' ? '● 进行中' : '✓ 已完成';
+    const statusClass = p.status === 'wip' ? 'status-wip' : 'status-done';
+
+    document.getElementById('modal-status').textContent = statusLabel;
+    document.getElementById('modal-status').className = `card-status ${statusClass}`;
+    document.getElementById('modal-title').textContent = p.name;
+    document.getElementById('modal-body').textContent = p.desc;
+
+    document.getElementById('detail-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDetailModal(e) {
+    if (e.target === document.getElementById('detail-modal')) closeModal();
+  }
+
+  // ── ADD / EDIT FORM ──────────────────────────────────────────────────
+  function openAddForm(status) {
+    document.getElementById('f-name').value = '';
+    document.getElementById('f-img').value = '';
+    document.getElementById('f-desc').value = '';
+    document.getElementById('f-status').value = status;
+    document.getElementById('f-edit-id').value = '';
+    document.getElementById('add-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeAddModal(e) {
+    if (e.target === document.getElementById('add-modal')) closeModal();
+  }
+
+  function saveProject() {
+    const name = document.getElementById('f-name').value.trim();
+    if (!name) { alert('请输入项目名称'); return; }
+
+    const img    = document.getElementById('f-img').value.trim();
+    const desc   = document.getElementById('f-desc').value.trim();
+    const status = document.getElementById('f-status').value;
+    const editId = document.getElementById('f-edit-id').value;
+
+    if (editId) {
+      const idx = projects.findIndex(p => p.id === +editId);
+      if (idx > -1) projects[idx] = { ...projects[idx], name, img, desc, status };
+    } else {
+      projects.push({ id: idCounter++, status, name, img, desc });
+    }
+
+    saveProjects(projects);
+    closeModal();
+    render();
+  }
+
+  // ── TABS ─────────────────────────────────────────────────────────────
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  // ── UTILS ─────────────────────────────────────────────────────────────
+  function closeModal() {
+    document.getElementById('detail-modal').classList.remove('open');
+    document.getElementById('add-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  render();
+</script>
+</body>
+</html>
