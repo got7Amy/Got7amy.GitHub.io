@@ -220,6 +220,46 @@
       padding-bottom: 1px;
     }
 
+    .card-actions {
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+    .action-btn {
+      border: 1px solid var(--tan);
+      background: rgba(255,255,255,0.45);
+      color: var(--mid);
+      font-family: 'Noto Serif SC', serif;
+      font-size: 0.76rem;
+      line-height: 1;
+      padding: 7px 9px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .action-btn:hover {
+      background: var(--tan);
+      color: var(--dark-brown);
+    }
+    .action-btn.complete {
+      border-color: var(--sage);
+      color: var(--sage);
+    }
+    .action-btn.complete:hover {
+      background: rgba(122,140,110,0.14);
+      color: var(--dark-brown);
+    }
+    .action-btn.danger {
+      border-color: rgba(181,82,42,0.45);
+      color: var(--rust);
+    }
+    .action-btn.danger:hover {
+      background: rgba(181,82,42,0.12);
+      color: var(--rust);
+    }
+
     /* ─── MODAL ─── */
     .modal-overlay {
       display: none;
@@ -286,6 +326,15 @@
       color: var(--mid);
       line-height: 1.9;
       white-space: pre-wrap;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+      padding-top: 22px;
+      border-top: 1px solid var(--tan);
     }
 
     .close-btn {
@@ -421,6 +470,8 @@
 
     @media (max-width: 600px) {
       .tab-btn { padding: 16px 20px; font-size: 0.82rem; }
+      .card-footer { align-items: flex-start; flex-direction: column; }
+      .card-actions { margin-left: 0; justify-content: flex-start; }
       .modal-content { padding: 24px; }
       .form-modal { padding: 28px 20px; }
     }
@@ -479,6 +530,7 @@
       </div>
       <h2 class="modal-title" id="modal-title"></h2>
       <div class="modal-body" id="modal-body"></div>
+      <div class="modal-actions" id="modal-actions"></div>
     </div>
   </div>
 </div>
@@ -486,7 +538,7 @@
 <!-- Add Form Modal -->
 <div class="modal-overlay" id="add-modal" onclick="closeAddModal(event)">
   <div class="form-modal" onclick="event.stopPropagation()">
-    <h3 class="form-title">添加钩织项目</h3>
+    <h3 class="form-title" id="form-title">添加钩织项目</h3>
     <div class="field">
       <label>项目名称</label>
       <input type="text" id="f-name" placeholder="例：草莓贝雷帽" />
@@ -593,6 +645,11 @@
       </div>
       <div class="card-footer">
         <span class="read-more">查看详情 →</span>
+        <div class="card-actions">
+          ${p.status === 'wip' ? `<button class="action-btn complete" onclick="markDone(${p.id}, event)">标记完成</button>` : ''}
+          <button class="action-btn" onclick="openEditForm(${p.id}, event)">编辑</button>
+          <button class="action-btn danger" onclick="deleteProject(${p.id}, event)">删除</button>
+        </div>
       </div>`;
     return div;
   }
@@ -614,6 +671,11 @@
     document.getElementById('modal-status').className = `card-status ${statusClass}`;
     document.getElementById('modal-title').textContent = p.name;
     document.getElementById('modal-body').textContent = p.desc;
+    document.getElementById('modal-actions').innerHTML = `
+      ${p.status === 'wip' ? `<button class="action-btn complete" onclick="markDone(${p.id}, event)">标记为已完成</button>` : ''}
+      <button class="action-btn" onclick="openEditForm(${p.id}, event)">编辑项目</button>
+      <button class="action-btn danger" onclick="deleteProject(${p.id}, event)">删除项目</button>
+    `;
 
     document.getElementById('detail-modal').classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -625,11 +687,28 @@
 
   // ── ADD / EDIT FORM ──────────────────────────────────────────────────
   function openAddForm(status) {
+    document.getElementById('form-title').textContent = '添加钩织项目';
     document.getElementById('f-name').value = '';
     document.getElementById('f-img').value = '';
     document.getElementById('f-desc').value = '';
     document.getElementById('f-status').value = status;
     document.getElementById('f-edit-id').value = '';
+    document.getElementById('add-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function openEditForm(id, e) {
+    if (e) e.stopPropagation();
+    const p = projects.find(x => x.id === id);
+    if (!p) return;
+
+    closeModal();
+    document.getElementById('form-title').textContent = '编辑钩织项目';
+    document.getElementById('f-name').value = p.name;
+    document.getElementById('f-img').value = p.img;
+    document.getElementById('f-desc').value = p.desc;
+    document.getElementById('f-status').value = p.status;
+    document.getElementById('f-edit-id').value = p.id;
     document.getElementById('add-modal').classList.add('open');
     document.body.style.overflow = 'hidden';
   }
@@ -659,12 +738,40 @@
     render();
   }
 
+  // ── PROJECT ACTIONS ──────────────────────────────────────────────────
+  function markDone(id, e) {
+    if (e) e.stopPropagation();
+    const p = projects.find(x => x.id === id);
+    if (!p || p.status === 'done') return;
+
+    p.status = 'done';
+    saveProjects(projects);
+    closeModal();
+    render();
+    switchTab('done');
+  }
+
+  function deleteProject(id, e) {
+    if (e) e.stopPropagation();
+    const p = projects.find(x => x.id === id);
+    if (!p) return;
+
+    if (!confirm(`确定要删除「${p.name}」吗？这个操作不能撤销。`)) return;
+    projects = projects.filter(x => x.id !== id);
+    saveProjects(projects);
+    closeModal();
+    render();
+  }
+
   // ── TABS ─────────────────────────────────────────────────────────────
   function switchTab(tab) {
     document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(tab).classList.add('active');
-    event.currentTarget.classList.add('active');
+
+    const btn = Array.from(document.querySelectorAll('.tab-btn'))
+      .find(b => b.getAttribute('onclick')?.includes(`'${tab}'`));
+    if (btn) btn.classList.add('active');
   }
 
   // ── UTILS ─────────────────────────────────────────────────────────────
