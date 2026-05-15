@@ -3,56 +3,101 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>天气穿搭助手（修复版）</title>
+  <meta name="color-scheme" content="dark" />
+  <title>天气穿搭助手</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --panel: rgba(15, 23, 42, 0.72);
-      --panel-2: rgba(30, 41, 59, 0.86);
-      --border: rgba(255, 255, 255, 0.12);
-      --text: #ecf3ff;
-      --muted: #b8c5db;
+      --bg: #07111f;
+      --bg-2: #0f172a;
+      --panel: rgba(15, 23, 42, 0.76);
+      --panel-2: rgba(30, 41, 59, 0.88);
+      --panel-soft: rgba(255, 255, 255, 0.07);
+      --border: rgba(255, 255, 255, 0.13);
+      --border-strong: rgba(125, 211, 252, 0.42);
+      --text: #eef6ff;
+      --muted: #b7c4d8;
+      --muted-2: #8fa3bd;
       --accent: #7dd3fc;
       --accent-2: #c4b5fd;
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
-      --radius: 22px;
+      --good: #bbf7d0;
+      --warning: #fde68a;
       --error: #fecaca;
-      --warning-bg: rgba(252, 211, 77, 0.12);
-      --warning-border: rgba(252, 211, 77, 0.3);
-      --warning-text: #fde68a;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --max: 1180px;
     }
 
     * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
       min-height: 100vh;
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(125, 211, 252, 0.18), transparent 30%),
-        radial-gradient(circle at 80% 10%, rgba(196, 181, 253, 0.18), transparent 24%),
-        linear-gradient(180deg, #0b1224 0%, #111827 100%);
-      padding: 20px;
+        radial-gradient(circle at 12% 0%, rgba(125, 211, 252, 0.22), transparent 28%),
+        radial-gradient(circle at 86% 8%, rgba(196, 181, 253, 0.2), transparent 26%),
+        radial-gradient(circle at 55% 100%, rgba(45, 212, 191, 0.1), transparent 26%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+      padding: 22px;
     }
 
+    button,
+    input { font: inherit; }
+
+    button {
+      border: 0;
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      color: inherit;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.16s ease, opacity 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    button:disabled { opacity: 0.55; cursor: wait; transform: none; }
+
+    a { color: #c7ebff; }
+
     .app {
-      max-width: 1160px;
+      max-width: var(--max);
       margin: 0 auto;
     }
 
     .hero {
+      position: relative;
+      overflow: hidden;
       display: grid;
       gap: 20px;
-      padding: 24px;
-      border-radius: 28px;
-      background: linear-gradient(180deg, rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.66));
+      padding: clamp(18px, 3vw, 28px);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.82), rgba(15, 23, 42, 0.64));
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       backdrop-filter: blur(18px);
     }
 
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: -80px -100px auto auto;
+      width: 260px;
+      height: 260px;
+      border-radius: 999px;
+      background: rgba(125, 211, 252, 0.14);
+      filter: blur(22px);
+      pointer-events: none;
+    }
+
     .hero-top {
+      position: relative;
       display: flex;
       justify-content: space-between;
       gap: 16px;
@@ -62,152 +107,170 @@
 
     h1 {
       margin: 0;
-      font-size: clamp(28px, 4vw, 42px);
-      line-height: 1.1;
-      letter-spacing: -0.02em;
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
     }
 
     .sub {
-      margin-top: 10px;
+      margin-top: 12px;
       color: var(--muted);
       font-size: 15px;
-      line-height: 1.65;
-      max-width: 820px;
+      line-height: 1.7;
+      max-width: 760px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+      align-items: center;
     }
 
     .pill {
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      min-height: 40px;
       padding: 10px 14px;
       border-radius: 999px;
       background: rgba(125, 211, 252, 0.12);
       border: 1px solid rgba(125, 211, 252, 0.26);
-      color: #dff4ff;
+      color: #e0f5ff;
       font-size: 13px;
       white-space: nowrap;
     }
 
-    .warning {
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: var(--warning-bg);
-      border: 1px solid var(--warning-border);
-      color: var(--warning-text);
-      font-size: 14px;
-      line-height: 1.6;
+    .unit-toggle {
+      display: inline-flex;
+      padding: 4px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.07);
+      border-radius: 999px;
+    }
+
+    .unit-toggle button {
+      min-width: 42px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      box-shadow: none;
+      font-size: 13px;
+    }
+
+    .unit-toggle button[aria-pressed="true"] {
+      color: #07111f;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
     }
 
     .search-row {
+      position: relative;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto auto;
       gap: 12px;
+      align-items: start;
     }
 
-    .input-wrap {
-      position: relative;
-    }
+    .input-wrap { position: relative; }
 
     input[type="text"] {
       width: 100%;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.13);
       background: rgba(255, 255, 255, 0.08);
       color: var(--text);
-      border-radius: 16px;
+      border-radius: var(--radius-md);
       padding: 16px 18px;
       font-size: 16px;
       outline: none;
       transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
     }
 
+    input[type="text"]::placeholder { color: rgba(238, 246, 255, 0.48); }
+
     input[type="text"]:focus {
-      border-color: rgba(125, 211, 252, 0.55);
+      border-color: rgba(125, 211, 252, 0.62);
       background: rgba(255, 255, 255, 0.12);
       transform: translateY(-1px);
     }
 
-    button {
-      border: 0;
-      border-radius: 16px;
-      padding: 14px 16px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.15s ease, opacity 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    button:hover { transform: translateY(-1px); }
-    button:disabled { opacity: 0.55; cursor: wait; transform: none; }
-
     .primary {
-      background: linear-gradient(135deg, #7dd3fc 0%, #a78bfa 100%);
-      color: #0b1224;
-      box-shadow: 0 12px 28px rgba(125, 211, 252, 0.22);
+      color: #06111f;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      box-shadow: 0 12px 28px rgba(125, 211, 252, 0.2);
     }
 
     .secondary {
       color: var(--text);
       background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.13);
     }
 
+    .quick-locations,
     .location-results {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 12px;
+    }
+
+    .quick-locations { margin-top: -4px; }
+
+    .chip,
+    .choice {
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.13);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      box-shadow: none;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 12px;
     }
 
     .choice {
-      padding: 10px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.08);
-      color: var(--text);
-      font-size: 13px;
-      cursor: pointer;
+      max-width: 100%;
+      text-align: left;
     }
 
-    .meta {
+    .status-row {
       display: flex;
-      flex-wrap: wrap;
+      justify-content: space-between;
       gap: 12px;
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 4px;
-    }
-
-    .status {
-      margin-top: 8px;
-      min-height: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+      min-height: 28px;
       color: var(--muted);
       font-size: 14px;
       line-height: 1.5;
+    }
+
+    #status.error { color: var(--error); }
+    #status.good { color: var(--good); }
+
+    .updated {
+      color: var(--muted-2);
+      font-size: 13px;
     }
 
     .grid-quick,
     .forecast-grid {
       display: grid;
       gap: 14px;
-      margin-top: 18px;
     }
 
     .grid-quick {
       grid-template-columns: repeat(5, minmax(0, 1fr));
-    }
-
-    .forecast-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      margin-top: 26px;
+      margin-top: 2px;
     }
 
     .card {
       background: var(--panel-2);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: var(--radius-lg);
       padding: 18px;
       backdrop-filter: blur(16px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
     }
 
     .metric-label {
@@ -217,10 +280,10 @@
     }
 
     .metric-value {
-      font-size: clamp(22px, 3vw, 30px);
-      font-weight: 800;
-      line-height: 1.15;
-      letter-spacing: -0.02em;
+      font-size: clamp(23px, 3vw, 32px);
+      font-weight: 900;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
     }
 
     .metric-note {
@@ -231,19 +294,37 @@
     }
 
     .section-title {
-      font-size: 22px;
-      margin: 30px 0 12px;
-      letter-spacing: -0.02em;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: end;
+      margin: 30px 2px 12px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: -0.03em;
+    }
+
+    .section-title span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .forecast-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .day-card {
       display: grid;
       gap: 14px;
       padding: 18px;
-      background: linear-gradient(180deg, rgba(30, 41, 59, 0.92), rgba(15, 23, 42, 0.94));
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.94), rgba(15, 23, 42, 0.96));
       border: 1px solid var(--border);
       border-radius: 24px;
-      min-height: 280px;
+      min-height: 300px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.18);
     }
 
     .day-head {
@@ -255,8 +336,9 @@
 
     .day-name {
       font-size: 19px;
-      font-weight: 800;
+      font-weight: 900;
       margin-bottom: 4px;
+      letter-spacing: -0.02em;
     }
 
     .day-date {
@@ -274,11 +356,10 @@
       border: 1px solid rgba(255,255,255,0.1);
       font-size: 14px;
       max-width: fit-content;
+      white-space: nowrap;
     }
 
-    .weather-emoji {
-      font-size: 22px;
-    }
+    .weather-emoji { font-size: 22px; }
 
     .mini-grid {
       display: grid;
@@ -287,8 +368,8 @@
     }
 
     .mini {
-      border-radius: 16px;
-      background: rgba(255,255,255,0.05);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.055);
       border: 1px solid rgba(255,255,255,0.08);
       padding: 12px;
     }
@@ -301,7 +382,7 @@
 
     .mini .value {
       font-size: 18px;
-      font-weight: 800;
+      font-weight: 900;
     }
 
     .tips {
@@ -312,8 +393,8 @@
     .tip {
       border-radius: 18px;
       padding: 12px 14px;
-      background: rgba(125, 211, 252, 0.08);
-      border: 1px solid rgba(125, 211, 252, 0.16);
+      background: rgba(125, 211, 252, 0.075);
+      border: 1px solid rgba(125, 211, 252, 0.15);
     }
 
     .tip strong {
@@ -328,25 +409,43 @@
       line-height: 1.6;
     }
 
+    .empty-state {
+      grid-column: 1 / -1;
+      padding: 28px;
+      color: var(--muted);
+      text-align: center;
+      border: 1px dashed rgba(255,255,255,0.16);
+      border-radius: 24px;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .skeleton {
+      position: relative;
+      overflow: hidden;
+      min-height: 104px;
+    }
+
+    .skeleton::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+      animation: shimmer 1.2s infinite;
+    }
+
+    @keyframes shimmer {
+      100% { transform: translateX(100%); }
+    }
+
     .footnote {
       margin-top: 20px;
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.7;
+      line-height: 1.8;
     }
 
-    pre.debug {
-      margin: 0;
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 12px;
-      color: #dbeafe;
-    }
-
-    a { color: #c7ebff; }
-
-    @media (max-width: 980px) {
+    @media (max-width: 1000px) {
       .grid-quick { grid-template-columns: repeat(2, minmax(0,1fr)); }
       .forecast-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
     }
@@ -354,67 +453,93 @@
     @media (max-width: 720px) {
       body { padding: 14px; }
       .hero { padding: 18px; }
+      .toolbar { justify-content: flex-start; }
       .search-row { grid-template-columns: 1fr; }
       .grid-quick { grid-template-columns: 1fr; }
       .forecast-grid { grid-template-columns: 1fr; }
       .mini-grid { grid-template-columns: 1fr 1fr; }
-      h1 { font-size: 30px; }
+      .section-title { align-items: flex-start; flex-direction: column; }
+      h1 { font-size: 32px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <section class="hero">
+  <main class="app">
+    <section class="hero" aria-labelledby="pageTitle">
       <div class="hero-top">
         <div>
-          <div class="pill">🌤️ 天气 + 穿搭，一锅端</div>
-          <h1>天气穿搭助手（修复版）</h1>
+          <h1 id="pageTitle">天气穿搭助手</h1>
           <div class="sub">
-            查每天的早上温度、白天最高温、会不会见太阳、会不会下雨、明天半夜最低温，
-            再顺手给大人和小孩出白天穿搭建议。定义写死在页面里：<strong>早上 = 08:00</strong>，<strong>明天半夜最低 = 明天 00:00–06:00 的最低温</strong>。
+            默认用华氏度。<strong>早上 = 08:00</strong>，<strong>明天半夜最低 = 明天 00:00–06:00 的最低温</strong>。
+            重点是帮你判断：今天要不要外套、娃要不要多备一层、会不会晒/淋雨。
           </div>
         </div>
-        <div class="pill" id="currentLocationTag">📍 还没查地点</div>
+
+        <div class="toolbar" aria-label="页面工具">
+          <div class="pill" id="currentLocationTag">📍 还没查地点</div>
+          <div class="unit-toggle" aria-label="温度单位">
+            <button id="fahrenheitBtn" type="button" aria-pressed="true">°F</button>
+            <button id="celsiusBtn" type="button" aria-pressed="false">°C</button>
+          </div>
+        </div>
       </div>
 
-      <div class="warning">
-        <strong>注意：</strong>如果你是在 iPhone 的“文件预览”或聊天里的文件预览里直接点开这个 HTML，JavaScript 和网络请求经常不会正常跑，按钮看起来就像在摸鱼。
-        最稳妥的用法是：把这个文件放到 GitHub Pages / Netlify / Vercel 之类的网址上再打开。
-      </div>
-
-      <form id="searchForm" class="search-row">
+      <form id="searchForm" class="search-row" autocomplete="off">
         <div class="input-wrap">
+          <label class="sr-only" for="locationInput">地点</label>
           <input id="locationInput" type="text" placeholder="输入城市、州、邮编，例如 Cherry Hill / 08003 / Philadelphia" />
-          <div class="location-results" id="locationResults"></div>
         </div>
         <button class="primary" id="searchBtn" type="submit">查询天气</button>
         <button class="secondary" id="geoBtn" type="button">用当前位置</button>
       </form>
 
-      <div class="meta">
-        <div id="updatedAt">更新时间：--</div>
-        <div id="sourceText">数据来源：Open-Meteo</div>
+      <div class="quick-locations" aria-label="常用地点">
+        <button class="chip" type="button" data-location="08003">08003</button>
+        <button class="chip" type="button" data-location="Cherry Hill, NJ">Cherry Hill</button>
+        <button class="chip" type="button" data-location="Philadelphia, PA">Philadelphia</button>
+        <button class="chip" type="button" data-location="New York, NY">New York</button>
       </div>
-      <div class="status" id="status">先输个地点试试。天气这玩意儿不等人，但页面会等你。</div>
 
-      <div class="grid-quick" id="quickCards">
-        <div class="card"><div class="metric-label">今天早上温度</div><div class="metric-value">--</div><div class="metric-note">08:00</div></div>
+      <div class="location-results" id="locationResults" aria-label="地点搜索结果"></div>
+
+      <div class="status-row">
+        <div id="status" role="status" aria-live="polite">准备查询天气。</div>
+        <div class="updated" id="updatedAt"></div>
+      </div>
+
+      <section class="grid-quick" id="quickCards" aria-label="今日天气摘要">
+        <div class="card"><div class="metric-label">今天早上温度</div><div class="metric-value">--</div><div class="metric-note">08:00 左右</div></div>
         <div class="card"><div class="metric-label">今天最热</div><div class="metric-value">--</div><div class="metric-note">白天最高温</div></div>
         <div class="card"><div class="metric-label">今天出太阳吗</div><div class="metric-value">--</div><div class="metric-note">结合日照与天气现象判断</div></div>
         <div class="card"><div class="metric-label">今天会下雨吗</div><div class="metric-value">--</div><div class="metric-note">结合降水概率与降水量判断</div></div>
         <div class="card"><div class="metric-label">明天半夜最低</div><div class="metric-value">--</div><div class="metric-note">明天 00:00–06:00</div></div>
-      </div>
+      </section>
     </section>
 
-    <h2 class="section-title">未来 7 天</h2>
-    <section class="forecast-grid" id="forecastGrid"></section>
+    <div class="section-title">
+      <h2>未来 7 天</h2>
+      <span>按温度、降水和日照自动生成穿搭建议</span>
+    </div>
+
+    <section class="forecast-grid" id="forecastGrid" aria-label="未来七天天气和穿搭建议">
+      <div class="empty-state">输入地点后会显示 7 天预测。</div>
+    </section>
 
     <div class="footnote">
-      穿搭建议是按温度、下雨与日照做的日常型建议，不替代你对体感、风、活动强度和空调强度的判断。小孩通常比大人<strong>多备一层但不一定要一直穿着</strong>。
+      穿搭建议是日常型建议，不替代你对体感、风、活动强度和室内空调强度的判断。小孩通常比大人<strong>多备一层但不一定要一直穿着</strong>。
       <br />
-      天气数据使用 Open-Meteo 的 Forecast 与 Geocoding API；该服务提供无需 API Key 的天气与地理编码接口，并要求展示归因。<a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Weather data by Open-Meteo.com</a>
+      Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo.com</a>.
     </div>
-  </div>
+  </main>
 
   <script>
     (() => {
@@ -448,30 +573,35 @@
         86: { text: '强阵雪', emoji: '🌨️' },
         95: { text: '雷雨', emoji: '⛈️' },
         96: { text: '雷雨夹小冰雹', emoji: '⛈️' },
-        99: { text: '雷雨夹冰雹', emoji: '⛈️' },
+        99: { text: '雷雨夹冰雹', emoji: '⛈️' }
       };
 
       const els = {};
+      const state = {
+        unit: safeGet('weather_unit') || 'fahrenheit',
+        lastLocation: null
+      };
 
       function safeGet(key) {
-        try {
-          return localStorage.getItem(key);
-        } catch (_) {
-          return null;
-        }
+        try { return localStorage.getItem(key); } catch (_) { return null; }
       }
 
       function safeSet(key, value) {
-        try {
-          localStorage.setItem(key, value);
-        } catch (_) {
-          // ignore
-        }
+        try { localStorage.setItem(key, value); } catch (_) { /* ignore */ }
       }
 
-      function setStatus(text, isError = false) {
+      function escapeHtml(value) {
+        return String(value ?? '')
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+      }
+
+      function setStatus(text, type = 'normal') {
         els.status.textContent = text;
-        els.status.style.color = isError ? 'var(--error)' : 'var(--muted)';
+        els.status.className = type === 'error' ? 'error' : type === 'good' ? 'good' : '';
       }
 
       function setLoading(isLoading, source = 'search') {
@@ -479,15 +609,31 @@
         els.geoBtn.disabled = isLoading;
         els.searchBtn.textContent = isLoading && source === 'search' ? '查询中…' : '查询天气';
         els.geoBtn.textContent = isLoading && source === 'geo' ? '定位中…' : '用当前位置';
+
+        if (isLoading) {
+          els.quickCards.innerHTML = Array.from({ length: 5 }, () => '<div class="card skeleton"></div>').join('');
+          els.forecastGrid.innerHTML = '<div class="empty-state">正在加载天气数据…</div>';
+        }
+      }
+
+      async function fetchJson(url, label) {
+        const response = await fetch(url, { headers: { accept: 'application/json' } });
+        if (!response.ok) throw new Error(`${label}请求失败：HTTP ${response.status}`);
+        return response.json();
       }
 
       function getWeatherInfo(code) {
         return WEATHER_CODE_MAP[code] || { text: '未知天气', emoji: '🌥️' };
       }
 
-      function celsius(value) {
+      function temp(value) {
         if (value === null || value === undefined || Number.isNaN(value)) return '--';
-        return `${Math.round(value)}°C`;
+        return `${Math.round(value)}°${state.unit === 'fahrenheit' ? 'F' : 'C'}`;
+      }
+
+      function rainAmount(value) {
+        if (value === null || value === undefined || Number.isNaN(value)) return '--';
+        return state.unit === 'fahrenheit' ? `${Number(value).toFixed(2)} in` : `${Number(value).toFixed(1)} mm`;
       }
 
       function formatDateLabel(dateString, index) {
@@ -503,10 +649,10 @@
         return new Intl.DateTimeFormat('zh-CN', { month: 'numeric', day: 'numeric' }).format(date);
       }
 
-      function findHourlyValue(hourly, dateString, hourString) {
+      function findHourlyValue(hourly, dateString, hourString, key = 'temperature_2m') {
         const target = `${dateString}T${hourString}`;
-        const index = hourly.time.findIndex(t => t === target);
-        if (index >= 0) return hourly.temperature_2m[index];
+        const exactIndex = hourly.time.findIndex(t => t === target);
+        if (exactIndex >= 0) return hourly[key]?.[exactIndex] ?? null;
 
         const prefix = `${dateString}T`;
         const sameDayIndexes = hourly.time
@@ -527,11 +673,11 @@
             best = item;
           }
         }
-        return hourly.temperature_2m[best.idx];
+        return hourly[key]?.[best.idx] ?? null;
       }
 
-      function getTomorrowOvernightLow(hourly, tomorrowDateString) {
-        const prefix = `${tomorrowDateString}T`;
+      function getOvernightLow(hourly, dateString) {
+        const prefix = `${dateString}T`;
         const values = hourly.time
           .map((t, idx) => ({ t, idx }))
           .filter(item => item.t.startsWith(prefix))
@@ -547,47 +693,53 @@
 
       function sunshineSummary(code, sunshineSeconds, daylightSeconds) {
         const ratio = daylightSeconds ? sunshineSeconds / daylightSeconds : 0;
-        const sunnyCodes = [0, 1, 2];
-        if (sunnyCodes.includes(code) || ratio >= 0.45) {
-          return { text: '会', note: `约 ${Math.round((sunshineSeconds || 0) / 3600)} 小时日照` };
-        }
-        if (ratio >= 0.18) {
-          return { text: '有一点', note: `约 ${Math.round((sunshineSeconds || 0) / 3600)} 小时日照` };
-        }
+        const hours = Math.round((sunshineSeconds || 0) / 3600);
+        if ([0, 1, 2].includes(code) || ratio >= 0.45) return { text: '会', note: `约 ${hours} 小时日照` };
+        if (ratio >= 0.18) return { text: '有一点', note: `约 ${hours} 小时日照` };
         return { text: '不太会', note: '日照偏少' };
       }
 
       function rainSummary(precipProb, precipSum, code) {
         const rainyCodes = [51,53,55,56,57,61,63,65,66,67,80,81,82,95,96,99];
-        const isRainy = rainyCodes.includes(code) || (precipProb ?? 0) >= 35 || (precipSum ?? 0) >= 0.2;
+        const threshold = state.unit === 'fahrenheit' ? 0.01 : 0.2;
+        const isRainy = rainyCodes.includes(code) || (precipProb ?? 0) >= 35 || (precipSum ?? 0) >= threshold;
         return {
           text: isRainy ? '会' : '大概率不会',
-          note: `${Math.round(precipProb || 0)}% 概率 / ${(precipSum || 0).toFixed(1)} mm`
+          note: `${Math.round(precipProb || 0)}% 概率 / ${rainAmount(precipSum || 0)}`
         };
       }
 
+      function feelsCold(value) {
+        if (value === null || value === undefined) return false;
+        return state.unit === 'fahrenheit' ? value <= 59 : value <= 15;
+      }
+
       function buildOutfit(isChild, morningTemp, maxTemp, willRain, sunnyText) {
-        const cooler = Math.min(morningTemp ?? maxTemp ?? 20, maxTemp ?? 20);
-        const warmer = maxTemp ?? cooler ?? 20;
+        const warmer = maxTemp ?? morningTemp ?? (state.unit === 'fahrenheit' ? 68 : 20);
+        const cooler = Math.min(morningTemp ?? warmer, warmer);
+        const t = state.unit === 'fahrenheit'
+          ? { hot: 86, warm: 79, mild: 72, cool: 64, chilly: 55, cold: 46 }
+          : { hot: 30, warm: 26, mild: 22, cool: 18, chilly: 13, cold: 8 };
+
         let base = '';
         let extra = '';
 
-        if (warmer >= 30) {
+        if (warmer >= t.hot) {
           base = '短袖 + 短裤/薄裙';
           extra = '室内空调重的话带一件超薄外套';
-        } else if (warmer >= 26) {
+        } else if (warmer >= t.warm) {
           base = '短袖 + 轻薄长裤或短裤';
-          extra = '早晚稍凉可加一件薄开衫';
-        } else if (warmer >= 22) {
-          base = cooler <= 16 ? '早上薄外套，中午可脱成短袖 + 长裤' : '短袖或薄长袖 + 长裤';
+          extra = feelsCold(cooler) ? '早上凉，中午热，薄开衫最稳' : '早晚稍凉可加一件薄开衫';
+        } else if (warmer >= t.mild) {
+          base = feelsCold(cooler) ? '早上薄外套，中午可脱成短袖 + 长裤' : '短袖或薄长袖 + 长裤';
           extra = '温差大的天，穿可脱层最省心';
-        } else if (warmer >= 18) {
+        } else if (warmer >= t.cool) {
           base = '薄长袖/卫衣 + 长裤';
           extra = '早上偏凉时可叠一件轻外套';
-        } else if (warmer >= 13) {
+        } else if (warmer >= t.chilly) {
           base = '卫衣/针织 + 外套 + 长裤';
           extra = '活动少的话别硬装春天已经完全来了';
-        } else if (warmer >= 8) {
+        } else if (warmer >= t.cold) {
           base = '较厚外套 + 打底/毛衣 + 长裤';
           extra = '怕冷体质可以加围巾';
         } else {
@@ -596,9 +748,9 @@
         }
 
         if (isChild) {
-          if (warmer >= 26) {
+          if (warmer >= t.warm) {
             extra = '小孩带一件薄外套备用，热了就脱，别焖着';
-          } else if (warmer >= 18) {
+          } else if (warmer >= t.cool) {
             extra = '小孩通常比大人多备一层，但跑起来很快会热';
           } else {
             extra = '小孩建议比大人多一层，尤其早上和阴雨天';
@@ -618,27 +770,27 @@
         els.quickCards.innerHTML = `
           <div class="card">
             <div class="metric-label">今天早上温度</div>
-            <div class="metric-value">${celsius(today.morningTemp)}</div>
+            <div class="metric-value">${temp(today.morningTemp)}</div>
             <div class="metric-note">08:00 左右</div>
           </div>
           <div class="card">
             <div class="metric-label">今天最热</div>
-            <div class="metric-value">${celsius(today.maxTemp)}</div>
+            <div class="metric-value">${temp(today.maxTemp)}</div>
             <div class="metric-note">白天最高温</div>
           </div>
           <div class="card">
             <div class="metric-label">今天出太阳吗</div>
-            <div class="metric-value">${today.sun.text}</div>
-            <div class="metric-note">${today.sun.note}</div>
+            <div class="metric-value">${escapeHtml(today.sun.text)}</div>
+            <div class="metric-note">${escapeHtml(today.sun.note)}</div>
           </div>
           <div class="card">
             <div class="metric-label">今天会下雨吗</div>
-            <div class="metric-value">${today.rain.text}</div>
-            <div class="metric-note">${today.rain.note}</div>
+            <div class="metric-value">${escapeHtml(today.rain.text)}</div>
+            <div class="metric-note">${escapeHtml(today.rain.note)}</div>
           </div>
           <div class="card">
             <div class="metric-label">明天半夜最低</div>
-            <div class="metric-value">${celsius(tomorrowOvernightLow)}</div>
+            <div class="metric-value">${temp(tomorrowOvernightLow)}</div>
             <div class="metric-note">明天 00:00–06:00</div>
           </div>
         `;
@@ -649,61 +801,55 @@
           <article class="day-card">
             <div class="day-head">
               <div>
-                <div class="day-name">${day.title}</div>
-                <div class="day-date">${day.dateFull}</div>
+                <div class="day-name">${escapeHtml(day.title)}</div>
+                <div class="day-date">${escapeHtml(day.dateFull)}</div>
               </div>
-              <div class="weather-badge"><span class="weather-emoji">${day.weather.emoji}</span><span>${day.weather.text}</span></div>
+              <div class="weather-badge"><span class="weather-emoji">${day.weather.emoji}</span><span>${escapeHtml(day.weather.text)}</span></div>
             </div>
 
             <div class="mini-grid">
-              <div class="mini"><div class="label">早上温度</div><div class="value">${celsius(day.morningTemp)}</div></div>
-              <div class="mini"><div class="label">白天最高</div><div class="value">${celsius(day.maxTemp)}</div></div>
-              <div class="mini"><div class="label">最低温</div><div class="value">${celsius(day.minTemp)}</div></div>
-              <div class="mini"><div class="label">下雨</div><div class="value">${day.rain.text}</div></div>
+              <div class="mini"><div class="label">早上温度</div><div class="value">${temp(day.morningTemp)}</div></div>
+              <div class="mini"><div class="label">白天最高</div><div class="value">${temp(day.maxTemp)}</div></div>
+              <div class="mini"><div class="label">最低温</div><div class="value">${temp(day.minTemp)}</div></div>
+              <div class="mini"><div class="label">下雨</div><div class="value">${escapeHtml(day.rain.text)}</div></div>
             </div>
 
             <div class="tips">
               <div class="tip">
                 <strong>☀️ 出太阳</strong>
-                <span>${day.sun.text}，${day.sun.note}</span>
+                <span>${escapeHtml(day.sun.text)}，${escapeHtml(day.sun.note)}</span>
               </div>
               <div class="tip">
                 <strong>🧑 大人白天穿搭</strong>
-                <span>${day.adult.base}。${day.adult.extra}</span>
+                <span>${escapeHtml(day.adult.base)}。${escapeHtml(day.adult.extra)}</span>
               </div>
               <div class="tip">
                 <strong>🧒 小孩白天穿搭</strong>
-                <span>${day.child.base}。${day.child.extra}</span>
+                <span>${escapeHtml(day.child.base)}。${escapeHtml(day.child.extra)}</span>
               </div>
             </div>
           </article>
         `).join('');
       }
 
-      async function fetchJson(url, label) {
-        let response;
-        try {
-          response = await fetch(url, { method: 'GET', mode: 'cors', cache: 'no-store' });
-        } catch (error) {
-          throw new Error(`${label}请求没发出去。你如果是在本地文件预览里打开，这很可能就是环境把网络请求拦了。`);
-        }
-
-        if (!response.ok) {
-          throw new Error(`${label}请求失败（HTTP ${response.status}）`);
-        }
-
-        try {
-          return await response.json();
-        } catch (_) {
-          throw new Error(`${label}返回的不是有效 JSON`);
-        }
-      }
-
       function formatLocationName(result) {
         return [result.name, result.admin1, result.country].filter(Boolean).join(' · ');
       }
 
-      async function fetchForecast(latitude, longitude, locationName) {
+      function setUnit(unit) {
+        state.unit = unit;
+        safeSet('weather_unit', unit);
+        els.fahrenheitBtn.setAttribute('aria-pressed', String(unit === 'fahrenheit'));
+        els.celsiusBtn.setAttribute('aria-pressed', String(unit === 'celsius'));
+
+        if (state.lastLocation) {
+          fetchForecast(state.lastLocation.latitude, state.lastLocation.longitude, state.lastLocation.name, false);
+        }
+      }
+
+      async function fetchForecast(latitude, longitude, locationName, showLoader = true) {
+        if (showLoader) setLoading(true, 'search');
+
         const dailyParams = [
           'weather_code',
           'temperature_2m_max',
@@ -714,13 +860,14 @@
           'daylight_duration'
         ].join(',');
 
-        const hourlyParams = ['temperature_2m', 'weather_code'].join(',');
+        const hourlyParams = ['temperature_2m'].join(',');
+        const precipitationUnit = state.unit === 'fahrenheit' ? 'inch' : 'mm';
 
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}&daily=${dailyParams}&hourly=${hourlyParams}&forecast_days=7&timezone=auto&temperature_unit=celsius`;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}&daily=${dailyParams}&hourly=${hourlyParams}&forecast_days=7&timezone=auto&temperature_unit=${state.unit}&precipitation_unit=${precipitationUnit}`;
         const data = await fetchJson(url, '天气');
 
         if (!data?.daily?.time?.length || !data?.hourly?.time?.length) {
-          throw new Error('没有拿到可用天气数据');
+          throw new Error('没有拿到可用天气数据。');
         }
 
         const days = data.daily.time.map((dateString, index) => {
@@ -730,6 +877,7 @@
           const rain = rainSummary(data.daily.precipitation_probability_max[index], data.daily.precipitation_sum[index], code);
           const adult = buildOutfit(false, morningTemp, data.daily.temperature_2m_max[index], rain.text === '会', sun.text);
           const child = buildOutfit(true, morningTemp, data.daily.temperature_2m_max[index], rain.text === '会', sun.text);
+
           return {
             index,
             dateString,
@@ -746,30 +894,26 @@
           };
         });
 
-        if (!days.length) {
-          throw new Error('天气列表为空');
-        }
-
-        const tomorrowOvernightLow = days[1] ? getTomorrowOvernightLow(data.hourly, days[1].dateString) : null;
+        const tomorrowOvernightLow = days[1] ? getOvernightLow(data.hourly, days[1].dateString) : null;
         fillQuickCards(days[0], tomorrowOvernightLow);
         renderForecast(days);
 
+        state.lastLocation = { latitude, longitude, name: locationName };
         els.currentLocationTag.textContent = `📍 ${locationName}`;
-        const updateText = new Date().toLocaleString('zh-CN');
-        els.updatedAt.textContent = `更新时间：${updateText}`;
-        setStatus(`已更新 ${locationName} 的天气和穿搭建议。`);
+        els.updatedAt.textContent = `更新：${new Date().toLocaleString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`;
+        setStatus(`已更新 ${locationName} 的天气和穿搭建议。`, 'good');
       }
 
       async function searchLocation(query) {
         const trimmed = query.trim();
         if (!trimmed) {
-          setStatus('先输入地点。城市、州、邮编都行。', true);
+          setStatus('先输入地点。城市、州、邮编都行。', 'error');
           return;
         }
 
         setLoading(true, 'search');
         els.locationResults.innerHTML = '';
-        setStatus(`正在找 “${trimmed}” 的地点…`);
+        setStatus(`正在找“${trimmed}”的地点…`);
 
         try {
           const params = new URLSearchParams({
@@ -779,16 +923,15 @@
             format: 'json'
           });
 
-          if (/^\d{5}$/.test(trimmed)) {
-            params.set('countryCode', 'US');
-          }
+          if (/^\d{5}$/.test(trimmed)) params.set('countryCode', 'US');
 
           const url = `https://geocoding-api.open-meteo.com/v1/search?${params.toString()}`;
           const data = await fetchJson(url, '地点搜索');
           const results = data.results || [];
 
           if (!results.length) {
-            setStatus('没找到这个地点。试试 “城市 + 州” 或邮编。', true);
+            setStatus('没找到这个地点。试试“城市 + 州”，比如 Cherry Hill, NJ。', 'error');
+            els.forecastGrid.innerHTML = '<div class="empty-state">没有找到匹配地点。</div>';
             return;
           }
 
@@ -796,39 +939,42 @@
 
           if (results.length === 1) {
             const pick = results[0];
-            await fetchForecast(pick.latitude, pick.longitude, formatLocationName(pick));
+            await fetchForecast(pick.latitude, pick.longitude, formatLocationName(pick), false);
             return;
           }
 
           setStatus('找到了多个地点，点一个最像你的。');
-          els.locationResults.innerHTML = results.slice(0, 6).map((item, idx) => {
-            return `<button class="choice" type="button" data-idx="${idx}">${formatLocationName(item)}</button>`;
-          }).join('');
+          els.locationResults.innerHTML = results.slice(0, 6).map((item, idx) => (
+            `<button class="choice" type="button" data-idx="${idx}">${escapeHtml(formatLocationName(item))}</button>`
+          )).join('');
+
+          els.forecastGrid.innerHTML = '<div class="empty-state">请选择一个地点后继续。</div>';
 
           els.locationResults.querySelectorAll('.choice').forEach(button => {
             button.addEventListener('click', async () => {
               const item = results[Number(button.dataset.idx)];
-              setLoading(true, 'search');
               els.locationResults.innerHTML = '';
+              setLoading(true, 'search');
               try {
-                await fetchForecast(item.latitude, item.longitude, formatLocationName(item));
+                await fetchForecast(item.latitude, item.longitude, formatLocationName(item), false);
               } catch (error) {
-                setStatus(error.message || '天气查询失败', true);
+                setStatus(error.message || '天气查询失败。', 'error');
               } finally {
                 setLoading(false, 'search');
               }
             });
           });
         } catch (error) {
-          setStatus(error.message || '地点查询失败', true);
+          setStatus(error.message || '地点查询失败。', 'error');
+          els.forecastGrid.innerHTML = '<div class="empty-state">查询失败，请稍后再试。</div>';
         } finally {
           setLoading(false, 'search');
         }
       }
 
-      async function useCurrentLocation() {
+      function useCurrentLocation() {
         if (!navigator.geolocation) {
-          setStatus('当前浏览器不支持定位。它有自己的想法。', true);
+          setStatus('当前浏览器不支持定位。可以直接搜城市或邮编。', 'error');
           return;
         }
 
@@ -840,17 +986,17 @@
           const { latitude, longitude } = position.coords;
           try {
             safeSet('weather_last_coords', JSON.stringify({ latitude, longitude }));
-            await fetchForecast(latitude, longitude, `当前位置 (${latitude.toFixed(2)}, ${longitude.toFixed(2)})`);
+            await fetchForecast(latitude, longitude, `当前位置 (${latitude.toFixed(2)}, ${longitude.toFixed(2)})`, false);
           } catch (error) {
-            setStatus(error.message || '定位天气查询失败', true);
+            setStatus(error.message || '定位天气查询失败。', 'error');
           } finally {
             setLoading(false, 'geo');
           }
         }, error => {
           const message = error.code === 1
-            ? '你拒绝了定位权限，所以我只能尊重你和系统的边界感。'
+            ? '你拒绝了定位权限。可以直接搜城市或邮编。'
             : '定位失败了，试试直接搜城市或邮编。';
-          setStatus(message, true);
+          setStatus(message, 'error');
           setLoading(false, 'geo');
         }, {
           enableHighAccuracy: true,
@@ -865,8 +1011,17 @@
           searchLocation(els.locationInput.value);
         });
 
-        els.geoBtn.addEventListener('click', () => {
-          useCurrentLocation();
+        els.geoBtn.addEventListener('click', useCurrentLocation);
+
+        els.fahrenheitBtn.addEventListener('click', () => setUnit('fahrenheit'));
+        els.celsiusBtn.addEventListener('click', () => setUnit('celsius'));
+
+        document.querySelectorAll('[data-location]').forEach(button => {
+          button.addEventListener('click', () => {
+            const location = button.dataset.location;
+            els.locationInput.value = location;
+            searchLocation(location);
+          });
         });
       }
 
@@ -881,20 +1036,17 @@
         els.locationResults = document.getElementById('locationResults');
         els.forecastGrid = document.getElementById('forecastGrid');
         els.quickCards = document.getElementById('quickCards');
+        els.fahrenheitBtn = document.getElementById('fahrenheitBtn');
+        els.celsiusBtn = document.getElementById('celsiusBtn');
       }
 
       function init() {
         initElements();
         bindEvents();
+        setUnit(state.unit === 'celsius' ? 'celsius' : 'fahrenheit');
 
         const lastQuery = safeGet('weather_last_query') || 'Cherry Hill, NJ';
         els.locationInput.value = lastQuery;
-
-        if (window.location.protocol === 'file:') {
-          setStatus('你现在像是直接在本地文件里打开它。按钮如果没反应，十有八九不是你手的问题，是这个打开方式不靠谱。', true);
-          return;
-        }
-
         searchLocation(lastQuery);
       }
 
