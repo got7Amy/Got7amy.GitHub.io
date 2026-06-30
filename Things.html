@@ -71,7 +71,7 @@ let groups=cu.map(dn=>({day:dn,items:week.filter(it=>it.day===dn).sort((a,b)=>a.
 let has=week.length>0;
 let removeItem=it=>{if(typeof setDone!=="function")return;mr()&&setDone(L=>(Array.isArray(L)?L:[]).filter(x=>!(x.id===it.id&&x.doneAt===it.doneAt)))};
 let promptLines=groups.map(gp=>`${gp.day}：${gp.items.map(it=>it.event).join("、")}`).join("\n");
-let aiPrompt=`这是我们这周（${rangeText}）在「心事花园」里一起走完的花径：\n${promptLines}\n\n请你做我们的花园小伙伴，用温柔的语气给我们一点回应：你从这一周里看到了什么、有什么感受，再给我们下一周一两个小小的建议或想试试的事。`;
+let aiPrompt=`这是我们这周（${rangeText}）在「花园小事」里一起走完的花径：\n${promptLines}\n\n请你做我们的花园小伙伴，用温柔的语气给我们一点回应：你从这一周里看到了什么、有什么感受，再给我们下一周一两个小小的建议或想试试的事。`;
 let copyPrompt=()=>{
   setShowPrompt(!0);
   let ok=()=>{setCopied(!0);setTimeout(()=>setCopied(!1),1800)};
